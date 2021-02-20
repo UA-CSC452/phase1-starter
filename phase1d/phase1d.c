@@ -44,7 +44,7 @@ P1_DeviceWait(int type, int unit, int *status)
     // check kernel mode
     // acquire device's lock 
     // while interrupt has not occurred and not aborted
-    //      wait for interrupt on type:unit
+    //      wait for interrupt or abort on type:unit
     // if not aborted
     //      set *status to device's status
     // release lock
@@ -57,9 +57,10 @@ static void
 DeviceHandler(int type, void *arg) 
 {
     // record that interrupt occurred
+    // save device status
     // if clock device
-    //      naked signal clock every 5 ticks
-    //      P1Dispatch(TRUE) every 4 ticks
+    //      naked signal clock every 5 interrupts
+    //      P1Dispatch(TRUE) every 4 interrupts
     // else
     //      naked signal type:unit
 }
@@ -93,6 +94,7 @@ P1_Join(int *pid, int *status)
     //        P1SetState(P1_STATE_JOINING)
     //        P1Dispatch(FALSE)
     // until either a child quit or there are no children
+    // restore interrupts
     return result;
 }
 
