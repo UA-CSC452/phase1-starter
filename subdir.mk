@@ -124,6 +124,7 @@ install: $(TARGET)
 
 .NOTPARALLEL: tests
 tests: $(TOUTS)
+tests-only: $(TOUTS) 
 
 # Remove implicit rules so that "make phaseX" doesn't try to build it from phaseX.c or phaseX.o
 % : %.c
@@ -133,8 +134,17 @@ tests: $(TOUTS)
 %.out: %
 	./$< 1> $@ --virtual-time 2>&1
 
-$(TESTS):   %: $(TARGET) %.o $(STUBS)
+ifeq ($(MAKECMDGOALS), tests-only)
+
+$(TESTS): %: %.o $(STUBS)
 	$(LD) $(LDFLAGS) -o $@ $@.o $(STUBS) $(LIBFLAGS)
+
+else
+$(TESTS):   %: $(TARGET) %.o $(STUBS)
+	echo $(TARGET)
+	$(LD) $(LDFLAGS) -o $@ $@.o $(STUBS) $(LIBFLAGS)
+
+endif
 
 clean:
 	rm -f $(COBJS) $(TARGET) $(TOBJS) $(TESTS) $(DEPS) $(TDEPS) $(TVS) $(STUBS) *.out tests/*.out tests/*.err
